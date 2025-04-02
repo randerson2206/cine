@@ -1,0 +1,135 @@
+/* Ajustes globais */
+html, body {
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
+    background-color: #141414;  /* Fundo escuro da Netflix */
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+}
+
+/* Navbar estilo Netflix */
+.navbar {
+    background-color: #141414;
+    padding: 15px 30px;
+}
+
+.navbar-brand {
+    font-size: 24px;
+    font-weight: bold;
+    color: #E50914 !important;
+}
+
+.navbar-nav .nav-link {
+    color: white !important;
+    margin: 0 15px;
+    font-size: 16px;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #E50914 !important;
+}
+
+/* Rodapé fixo no final */
+.footer {
+    margin-top: auto;
+    background-color: #181818;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+}
+
+/* Estilização de títulos */
+h1, h2, h3 {
+    color: #E50914; /* Vermelho Netflix */
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Estilização dos cards de filmes */
+.card {
+    border: none;
+    transition: all 0.3s ease-in-out;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: transparent;
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.1);
+}
+
+.card-img-top {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Rolagem horizontal estilo Netflix */
+.filme-lista {
+    display: flex;
+    overflow-x: auto;
+    padding: 20px 0;
+    gap: 10px;
+}
+
+.filme-lista::-webkit-scrollbar {
+    display: none;
+}
+
+/* Botões personalizados */
+.btn {
+    border-radius: 5px;
+    padding: 10px 16px; /* Reduzindo o tamanho geral dos botões */
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #E50914;
+    border-color: #E50914;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #b20710;
+    border-color: #b20710;
+}
+
+/* Ajuste específico para o botão de gênero */
+.btn-genero {
+    padding: 8px 14px; /* Reduzindo tamanho do botão de gênero */
+    font-size: 12px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .card-img-top {
+        height: 200px;
+    }
+    h1 {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-img-top {
+        height: 150px;
+    }
+    h1 {
+        font-size: 1.5rem;
+    }
+}
