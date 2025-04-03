@@ -15,12 +15,9 @@
         </div>
         <div class="mb-3">
             <label for="genero" class="form-label">Gênero</label>
-            <div class="d-flex">
-                <select class="form-control" id="genero" name="genero_id" required>
-                    <option value="">Selecione um gênero</option>
-                </select>
-                <button type="button" class="btn btn-danger ms-2" id="add-genero">+</button>
-            </div>
+            <select class="form-control" id="genero" name="genero_id" required>
+                <option value="">Selecione um gênero</option>
+            </select>
         </div>
         <div class="mb-3">
             <label for="data_lancamento" class="form-label">Data de Lançamento</label>
@@ -32,7 +29,7 @@
         </div>
         <div class="mb-3">
             <label for="imagem" class="form-label">Imagem</label>
-            <input type="file" class="form-control" id="imagem" name="imagem" accept=".jpg, .jpeg, .png">
+            <input type="file" class="form-control" id="imagem" name="imagem" accept=".jpg, .jpeg, .png" required>
             <small class="text-muted">Formatos permitidos: .jpg, .jpeg, .png</small>
         </div>
         <div class="mb-3">
@@ -62,7 +59,6 @@
         carregarFilmes();
         carregarGeneros();
         document.getElementById('form-filme').addEventListener('submit', salvarFilme);
-        document.getElementById('add-genero').addEventListener('click', adicionarGenero);
     });
 
     function carregarFilmes() {
@@ -97,23 +93,6 @@
                 document.getElementById('genero').innerHTML = options;
             })
             .catch(error => console.error('Erro ao carregar gêneros:', error));
-    }
-
-    function adicionarGenero() {
-        const nomeGenero = prompt('Digite o nome do novo gênero:');
-        if (nomeGenero) {
-            fetch('api.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `tipo=genero&nome=${encodeURIComponent(nomeGenero)}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                carregarGeneros();
-            })
-            .catch(error => console.error('Erro ao adicionar gênero:', error));
-        }
     }
 
     function salvarFilme(event) {
@@ -151,7 +130,7 @@
 
     function excluirFilme(id) {
         if (confirm('Tem certeza que deseja excluir este filme?')) {
-            fetch(`api.php?tipo=filme&id=${id}`, { method: 'DELETE' })
+            fetch(`api.php?id=${id}`, { method: 'DELETE' })
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);
