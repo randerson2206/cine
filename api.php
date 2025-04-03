@@ -79,6 +79,48 @@ if ($method === 'POST') {
             }
         }
 
+        // Salvar ou atualizar gênero
+if ($method === 'POST' && isset($_POST['tipo']) && $_POST['tipo'] === 'genero') {
+    try {
+        $nome = $_POST['nome'] ?? '';
+
+        if (empty($nome)) {
+            echo json_encode(['status' => 'error', 'message' => 'O nome do gênero é obrigatório.']);
+            exit;
+        }
+
+        // Inserir novo gênero
+        $stmt = $db->prepare("INSERT INTO generos (nome) VALUES (:nome)");
+        $stmt->execute([
+            ':nome' => $nome
+        ]);
+        
+        echo json_encode(['status' => 'success', 'message' => 'Gênero salvo com sucesso!']);
+        exit;
+    } catch (Exception $e) {
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        exit;
+    }
+}
+
+// Salvar ou atualizar gênero
+if (isset($_POST['genero_nome'])) {
+    try {
+        $genero_nome = $_POST['genero_nome'];
+
+        // Inserir novo gênero
+        $stmt = $db->prepare("INSERT INTO generos (nome) VALUES (:nome)");
+        $stmt->execute([
+            ':nome' => $genero_nome
+        ]);
+        echo json_encode(['status' => 'success', 'message' => 'Gênero salvo com sucesso!']);
+    } catch (Exception $e) {
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+
+        
         if (!empty($filme_id)) {
             // Atualizar filme
             $stmt = $db->prepare("UPDATE filmes SET titulo = :titulo, sinopse = :sinopse, genero_id = :genero_id, link = :link, data_lancamento = :data_lancamento, duracao = :duracao" . 
