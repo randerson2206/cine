@@ -1,28 +1,31 @@
 <?php include('views/header.php'); ?>
 
-<!-- Container para garantir o layout responsivo -->
-<div class="container">
-
-    <!-- Título centralizado -->
-    <h1 class="text-center mb-4">🎬 Lista de Filmes</h1>
-
-    <!-- Filtro e pesquisa em um layout flexível -->
-    <div class="d-flex flex-column flex-sm-row justify-content-between mb-4">
-        <!-- Campo de pesquisa -->
-        <input type="text" id="pesquisa" class="form-control mb-3 mb-sm-0 me-2" placeholder="🔎 Buscar filme..."> 
-
-        <!-- Botão de pesquisa -->
-        <button id="btn-pesquisar" class="btn btn-primary mb-3 mb-sm-0" onclick="filtrarFilmes()">Pesquisar</button>
-
-        <!-- Filtro por gênero -->
-        <select id="filtro-genero" class="form-select" onchange="filtrarFilmes()">
-            <option value="">Todos os Gêneros</option>
-        </select>
+<!-- Container principal -->
+<div class="container mt-4">
+    <!-- Banner estilo Netflix -->
+    <div class="banner text-center text-white py-5">
+        <h1 class="fw-bold">🎬 Descubra os Melhores Filmes</h1>
+        <p class="lead">Explore, assista trailers e escolha seu próximo filme favorito!</p>
+    </div>
+    
+    <!-- Filtro e pesquisa com layout flexível -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-4">
+            <input type="text" id="pesquisa" class="form-control" placeholder="🔎 Buscar filme...">
+        </div>
+        <div class="col-md-3">
+            <select id="filtro-genero" class="form-select" onchange="filtrarFilmes()">
+                <option value="">Todos os Gêneros</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button id="btn-pesquisar" class="btn btn-danger w-100" onclick="filtrarFilmes()">Pesquisar</button>
+        </div>
     </div>
 
-    <!-- Lista de filmes ajustada para responsividade -->
-    <div class="row" id="lista-filmes">
-        <!-- Os filmes serão carregados dinamicamente aqui -->
+    <!-- Lista de filmes com informações visíveis -->
+    <div class="row row-cols-1 row-cols-md-3 g-3" id="lista-filmes">
+        <!-- Filmes serão carregados dinamicamente aqui -->
     </div>
 </div>
 
@@ -34,10 +37,9 @@
         carregarGeneros();
     });
 
-    // Função para formatar a data de lançamento no formato DD/MM/YYYY
     function formatarData(data) {
         const [ano, mes, dia] = data.split('-');
-        return `${dia}/${mes}/${ano}`; // Formato DD/MM/AAAA
+        return `${dia}/${mes}/${ano}`;
     }
 
     function carregarFilmes() {
@@ -53,18 +55,18 @@
     function renderizarFilmes(lista) {
         let html = '';
         lista.forEach(filme => {
-            const dataFormatada = formatarData(filme.data_lancamento); // Formata a data
+            const dataFormatada = formatarData(filme.data_lancamento);
             html += `
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4" data-id="${filme.id}">
-                    <div class="card h-100 shadow-sm">
-                        <img src="${filme.capa}" class="card-img-top" alt="${filme.titulo}">
+                <div class="col">
+                    <div class="card bg-dark text-white shadow-sm border-0" style="height: 100%;">
+                        <img src="${filme.capa}" class="card-img-top" alt="${filme.titulo}" style="height: 250px; object-fit: cover;">
                         <div class="card-body">
                             <h5 class="card-title">${filme.titulo}</h5>
-                            <p class="filme-info"><strong>Gênero:</strong> ${filme.genero}</p>
-                            <p class="filme-info"><strong>Duração:</strong> ${filme.duracao} min</p>
-                            <p class="filme-info"><strong>Data de Lançamento:</strong> ${dataFormatada}</p> <!-- Data formatada -->
-                            <p class="card-text">${filme.sinopse}</p>
-                            <a href="${filme.link}" target="_blank" class="btn btn-primary w-100">🎬 Assistir Trailer</a>
+                            <p><strong>Gênero:</strong> ${filme.genero}</p>
+                            <p><strong>Duração:</strong> ${filme.duracao} min</p>
+                            <p><strong>Data de Lançamento:</strong> ${dataFormatada}</p>
+                            <p><strong>Sinopse:</strong> ${filme.sinopse}</p>
+                            <a href="${filme.link}" target="_blank" class="btn btn-danger w-100">🎬 Assistir Trailer</a>
                         </div>
                     </div>
                 </div>
@@ -101,5 +103,26 @@
         renderizarFilmes(filmesFiltrados);
     }
 </script>
+
+<style>
+    body {
+        background-color: #141414;
+        color: white;
+    }
+    .banner {
+        background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.3)), url('banner.jpg') center/cover;
+        border-radius: 10px;
+    }
+    .card {
+        transition: transform 0.3s ease-in-out;
+        height: 100%;
+    }
+    .card:hover {
+        transform: scale(1.05);
+    }
+    .card-body p {
+        font-size: 14px;
+    }
+</style>
 
 <?php include('views/footer.php'); ?>
