@@ -24,7 +24,7 @@
     </div>
 
     <!-- Lista de filmes com informações visíveis -->
-    <div class="row row-cols-1 row-cols-md-3 g-3" id="lista-filmes">
+    <div class="row row-cols-1 row-cols-md-2 g-4" id="lista-filmes">
         <!-- Filmes serão carregados dinamicamente aqui -->
     </div>
 </div>
@@ -58,15 +58,15 @@
             const dataFormatada = formatarData(filme.data_lancamento);
             html += `
                 <div class="col">
-                    <div class="card bg-dark text-white shadow-sm border-0" style="height: 100%;">
-                        <img src="${filme.capa}" class="card-img-top" alt="${filme.titulo}" style="height: 250px; object-fit: cover;">
+                    <div class="card bg-dark text-white shadow-sm border-0 d-flex flex-row align-items-center p-3">
+                        <img src="${filme.capa}" class="card-img-left" alt="${filme.titulo}" style="width: 150px; height: auto; object-fit: cover; border-radius: 10px;">
                         <div class="card-body">
                             <h5 class="card-title">${filme.titulo}</h5>
                             <p><strong>Gênero:</strong> ${filme.genero}</p>
                             <p><strong>Duração:</strong> ${filme.duracao} min</p>
                             <p><strong>Data de Lançamento:</strong> ${dataFormatada}</p>
                             <p><strong>Sinopse:</strong> ${filme.sinopse}</p>
-                            <a href="${filme.link}" target="_blank" class="btn btn-danger w-100">🎬 Assistir Trailer</a>
+                            <a href="${filme.link}" target="_blank" class="btn btn-danger">🎬 Assistir Trailer</a>
                         </div>
                     </div>
                 </div>
@@ -114,14 +114,27 @@
         border-radius: 10px;
     }
     .card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         transition: transform 0.3s ease-in-out;
-        height: 100%;
+        height: auto;
     }
     .card:hover {
-        transform: scale(1.05);
+        transform: scale(1.02);
+    }
+    .card-body {
+        flex: 1;
     }
     .card-body p {
         font-size: 14px;
+    }
+    .card-img-left {
+        flex-shrink: 0;
+        width: 150px;
+        height: auto;
+        object-fit: cover;
+        border-radius: 10px;
     }
 </style>
 
