@@ -12,13 +12,11 @@ if ($method === 'POST' && isset($_POST['_method'])) {
     $method = $_POST['_method'];
 }
 
-// 🔹 Buscar filmes
+// Buscar filmes
 if (isset($_GET['tipo']) && $_GET['tipo'] === 'filme') {
     if (isset($_GET['id'])) {
         $id = intval($_GET['id']);
-        $stmt = $db->prepare("SELECT f.*, g.nome AS genero FROM filmes f 
-                              LEFT JOIN generos g ON f.genero_id = g.id
-                              WHERE f.id = :id");
+        $stmt = $db->prepare("SELECT * FROM filmes WHERE id = :id");
         $stmt->bindParam(':id', $id);
         $stmt->execute();
         $filme = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -33,18 +31,23 @@ if (isset($_GET['tipo']) && $_GET['tipo'] === 'filme') {
         $query = "SELECT f.*, g.nome AS genero FROM filmes f
                   LEFT JOIN generos g ON f.genero_id = g.id";
         $result = $db->query($query);
+
         $filmes = $result->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($filmes as &$filme) {
             $filme['capa'] = !empty($filme['capa']) ? 'uploads/' . $filme['capa'] : 'uploads/default.png';
         }
 
-        echo json_encode(!empty($filmes) ? $filmes : ['status' => 'error', 'message' => 'Nenhum filme encontrado.']);
+        if (!empty($filmes)) {
+            echo json_encode($filmes);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Nenhum filme encontrado.']);
+        }
     }
     exit;
 }
 
-// 🔹 Buscar gêneros
+// Buscar gêneros
 if (isset($_GET['tipo']) && $_GET['tipo'] === 'genero') {
     $query = "SELECT id, nome FROM generos";
     $result = $db->query($query);
@@ -54,8 +57,8 @@ if (isset($_GET['tipo']) && $_GET['tipo'] === 'genero') {
     exit;
 }
 
-// 🔹 Salvar ou atualizar filme
-if ($method === 'POST' && isset($_POST['tipo']) && $_POST['tipo'] === 'filme') {
+// Salvar ou atualizar filme
+if ($method === 'POST') {
     try {
         $filme_id = $_POST['filme_id'] ?? '';
         $titulo = $_POST['titulo'] ?? '';
@@ -66,16 +69,7 @@ if ($method === 'POST' && isset($_POST['tipo']) && $_POST['tipo'] === 'filme') {
         $duracao = $_POST['duracao'] ?? '';
         $capa = '';
 
-        // 🔹 Verificar se o gênero existe antes de cadastrar o filme
-        $stmt = $db->prepare("SELECT id FROM generos WHERE id = :genero_id");
-        $stmt->bindParam(':genero_id', $genero_id);
-        $stmt->execute();
-        if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
-            echo json_encode(['status' => 'error', 'message' => 'O gênero selecionado não existe.']);
-            exit;
-        }
-
-        // 🔹 Upload de imagem
+        // Upload de imagem
         if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK) {
             $extensao = pathinfo($_FILES['imagem']['name'], PATHINFO_EXTENSION);
             $nomeArquivo = uniqid() . '.' . $extensao;
@@ -86,10 +80,9 @@ if ($method === 'POST' && isset($_POST['tipo']) && $_POST['tipo'] === 'filme') {
         }
 
         if (!empty($filme_id)) {
-            // 🔹 Atualizar filme
-            $stmt = $db->prepare("UPDATE filmes SET titulo = :titulo, sinopse = :sinopse, genero_id = :genero_id, 
-                                  link = :link, data_lancamento = :data_lancamento, duracao = :duracao" . 
-                                  ($capa ? ", capa = :capa" : "") . " WHERE id = :id");
+            // Atualizar filme
+            $stmt = $db->prepare("UPDATE filmes SET titulo = :titulo, sinopse = :sinopse, genero_id = :genero_id, link = :link, data_lancamento = :data_lancamento, duracao = :duracao" . 
+                ($capa ? ", capa = :capa" : "") . " WHERE id = :id");
 
             $params = [
                 ':id' => $filme_id,
@@ -108,9 +101,8 @@ if ($method === 'POST' && isset($_POST['tipo']) && $_POST['tipo'] === 'filme') {
             $stmt->execute($params);
             echo json_encode(['status' => 'success', 'message' => 'Filme atualizado com sucesso!']);
         } else {
-            // 🔹 Inserir novo filme
-            $stmt = $db->prepare("INSERT INTO filmes (titulo, sinopse, capa, link, genero_id, data_lancamento, duracao) 
-                                  VALUES (:titulo, :sinopse, :capa, :link, :genero_id, :data_lancamento, :duracao)");
+            // Inserir novo filme
+            $stmt = $db->prepare("INSERT INTO filmes (titulo, sinopse, capa, link, genero_id, data_lancamento, duracao) VALUES (:titulo, :sinopse, :capa, :link, :genero_id, :data_lancamento, :duracao)");
             $stmt->execute([
                 ':titulo' => $titulo,
                 ':sinopse' => $sinopse,
@@ -129,39 +121,7 @@ if ($method === 'POST' && isset($_POST['tipo']) && $_POST['tipo'] === 'filme') {
     }
 }
 
-// 🔹 Salvar gênero
-if ($method === 'POST' && isset($_POST['tipo']) && $_POST['tipo'] === 'genero') {
-    try {
-        $nome = $_POST['nome'];
-
-        // Verifica se o gênero já existe
-        $stmt = $db->prepare("SELECT id FROM generos WHERE nome = :nome");
-        $stmt->bindParam(':nome', $nome);
-        $stmt->execute();
-        $generoExistente = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($generoExistente) {
-            echo json_encode(['status' => 'error', 'message' => 'Gênero já existe!', 'genero_id' => $generoExistente['id']]);
-            exit;
-        }
-
-        // Insere o novo gênero
-        $stmt = $db->prepare("INSERT INTO generos (nome) VALUES (:nome)");
-        $stmt->bindParam(':nome', $nome);
-        $stmt->execute();
-
-        // Pega o ID recém-criado
-        $genero_id = $db->lastInsertId();
-
-        echo json_encode(['status' => 'success', 'message' => 'Gênero cadastrado com sucesso!', 'genero_id' => $genero_id]);
-        exit;
-    } catch (Exception $e) {
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
-        exit;
-    }
-}
-
-// 🔹 Excluir filme
+// Excluir filme
 if ($method === 'DELETE' && isset($_GET['id'])) {
     $id = intval($_GET['id']);
     $stmt = $db->prepare("DELETE FROM filmes WHERE id = :id");
