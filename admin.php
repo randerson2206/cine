@@ -129,11 +129,18 @@
         fetch('api.php?tipo=genero')
             .then(response => response.json())
             .then(data => {
-                let options = '<option value="">Selecione um gênero</option>';
+                let html = '';
                 data.forEach(genero => {
-                    options += `<option value="${genero.id}">${genero.nome}</option>`;
+                    html += `
+                        <tr>
+                            <td>${genero.nome}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="editarGenero(${genero.id})">Editar</button>
+                                <button class="btn btn-danger btn-sm" onclick="excluirGenero(${genero.id})">Excluir</button>
+                            </td>
+                        </tr>`;
                 });
-                document.getElementById('genero').innerHTML = options;
+                document.getElementById('lista-generos-admin').innerHTML = html;
             })
             .catch(error => console.error('Erro ao carregar gêneros:', error));
     }
@@ -174,6 +181,186 @@
         .catch(error => console.error('Erro ao salvar gênero:', error));
     }
 
+    function editarGenero(id) {
+        fetch(`api.php?tipo=genero&id=${id}`)
+            .then(response => response.json())
+            .then(genero => {
+                document.getElementById('genero_id').value = genero.id;
+                document.getElementById('genero_nome').value = genero.nome;
+            })
+            .catch(error => console.error('Erro ao carregar gênero:', error));
+    }
+
+    function excluirGenero(id) {
+        if (confirm('Tem certeza que deseja excluir este gênero?')) {
+            fetch(`api.php?id=${id}&tipo=genero`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    carregarGeneros();
+                })
+                .catch(error => console.error('Erro ao excluir gênero:', error));
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+    carregarFilmes();
+    carregarGeneros(); // Carregar os gêneros
+    document.getElementById('form-filme').addEventListener('submit', salvarFilme);
+    document.getElementById('form-genero').addEventListener('submit', salvarGenero); // Adicionando evento para salvar gênero
+});
+
+function carregarFilmes() {
+    fetch('api.php?tipo=filme')
+        .then(response => response.json())
+        .then(data => {
+            let html = '';
+            data.forEach(filme => {
+                html += `
+                    <tr>
+                        <td>${filme.titulo}</td>
+                        <td>${filme.genero}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editarFilme(${filme.id})">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="excluirFilme(${filme.id})">Excluir</button>
+                        </td>
+                    </tr>`;
+            });
+            document.getElementById('lista-filmes-admin').innerHTML = html;
+        })
+        .catch(error => console.error('Erro ao carregar filmes:', error));
+}
+
+function carregarGeneros() {
+    // Carregar tanto para a listagem quanto para o select
+    fetch('api.php?tipo=genero')
+        .then(response => response.json())
+        .then(data => {
+            let htmlGeneros = '';
+            let selectHtml = '<option value="">Selecione um gênero</option>';
+            data.forEach(genero => {
+                // Para a tabela de gêneros cadastrados
+                htmlGeneros += `
+                    <tr>
+                        <td>${genero.nome}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editarGenero(${genero.id})">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="excluirGenero(${genero.id})">Excluir</button>
+                        </td>
+                    </tr>`;
+                // Para o select de gêneros no formulário de filmes
+                selectHtml += `<option value="${genero.id}">${genero.nome}</option>`;
+            });
+            // Preencher a tabela de gêneros
+            document.getElementById('lista-generos-admin').innerHTML = htmlGeneros;
+            // Preencher o select de gêneros
+            document.getElementById('genero').innerHTML = selectHtml;
+        })
+        .catch(error => console.error('Erro ao carregar gêneros:', error));
+}
+
+function salvarFilme(event) {
+    event.preventDefault();
+    const formData = new FormData(document.getElementById('form-filme'));
+    fetch('api.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.status === 'success') {
+            document.getElementById('form-filme').reset();
+            carregarFilmes(); // Recarregar os filmes
+        }
+    })
+    .catch(error => console.error('Erro ao salvar filme:', error));
+}
+
+function salvarGenero(event) {
+    event.preventDefault();
+    const formData = new FormData(document.getElementById('form-genero'));
+    fetch('api.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.status === 'success') {
+            document.getElementById('form-genero').reset();
+            carregarGeneros(); // Recarregar os gêneros após salvar
+        }
+    })
+    .catch(error => console.error('Erro ao salvar gênero:', error));
+}
+
+function editarGenero(id) {
+    fetch(`api.php?tipo=genero&id=${id}`)
+        .then(response => response.json())
+        .then(genero => {
+            document.getElementById('genero_id').value = genero.id;
+            document.getElementById('genero_nome').value = genero.nome;
+        })
+        .catch(error => console.error('Erro ao carregar gênero:', error));
+}
+
+function excluirGenero(id) {
+    if (confirm('Tem certeza que deseja excluir este gênero?')) {
+        fetch(`api.php?id=${id}&tipo=genero`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                carregarGeneros();
+            })
+            .catch(error => console.error('Erro ao excluir gênero:', error));
+    }
+}
+
+function editarFilme(id) {
+    fetch(`api.php?tipo=filme&id=${id}`)
+        .then(response => response.json())
+        .then(filme => {
+            document.getElementById('filme_id').value = filme.id;
+            document.getElementById('titulo').value = filme.titulo;
+            document.getElementById('sinopse').value = filme.sinopse;
+            document.getElementById('genero').value = filme.genero_id;
+            document.getElementById('data_lancamento').value = filme.data_lancamento;
+            document.getElementById('duracao').value = filme.duracao;
+            document.getElementById('trailer').value = filme.trailer;
+        })
+        .catch(error => console.error('Erro ao carregar filme:', error));
+}
+
+function excluirFilme(id) {
+    if (confirm('Tem certeza que deseja excluir este filme?')) {
+        fetch(`api.php?id=${id}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                carregarFilmes();
+            })
+            .catch(error => console.error('Erro ao excluir filme:', error));
+    }
+}
+
+    function carregarGeneros() {
+    fetch('api.php?tipo=genero')
+        .then(response => response.json())
+        .then(data => {
+            let html = '';
+            data.forEach(genero => {
+                html += `
+                    <option value="${genero.id}">${genero.nome}</option>
+                `;
+            });
+            // Preencher o select de gêneros
+            document.getElementById('genero').innerHTML = `<option value="">Selecione um gênero</option>` + html;
+        })
+        .catch(error => console.error('Erro ao carregar gêneros:', error));
+}
+
+
     function editarFilme(id) {
         fetch(`api.php?tipo=filme&id=${id}`)
             .then(response => response.json())
@@ -202,4 +389,4 @@
     }
 </script>
 
-<?php include('views/footer.php'); ?>  
+<?php include('views/footer.php'); ?>
