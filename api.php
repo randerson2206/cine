@@ -12,6 +12,8 @@ if ($method === 'POST' && isset($_POST['_method'])) {
     $method = $_POST['_method'];
 }
 
+
+
 // Buscar filmes
 if (isset($_GET['tipo']) && $_GET['tipo'] === 'filme') {
     if (isset($_GET['id'])) {
@@ -120,7 +122,9 @@ if (isset($_POST['genero_nome'])) {
     exit;
 }
 
+
         
+
         if (!empty($filme_id)) {
             // Atualizar filme
             $stmt = $db->prepare("UPDATE filmes SET titulo = :titulo, sinopse = :sinopse, genero_id = :genero_id, link = :link, data_lancamento = :data_lancamento, duracao = :duracao" . 
