@@ -23,8 +23,8 @@
         </div>
     </div>
 
-    <!-- Lista de filmes com informações visíveis -->
-    <div class="row row-cols-1 row-cols-md-2 g-4" id="lista-filmes">
+    <!-- Lista de filmes -->
+    <div class="row" id="lista-filmes">
         <!-- Filmes serão carregados dinamicamente aqui -->
     </div>
 </div>
@@ -54,25 +54,56 @@
 
     function renderizarFilmes(lista) {
         let html = '';
-        lista.forEach(filme => {
+        lista.forEach((filme, index) => {
             const dataFormatada = formatarData(filme.data_lancamento);
+            const avaliacaoTexto = filme.avaliacao ? filme.avaliacao : 'Avaliação';
             html += `
-                <div class="col">
-                    <div class="card bg-dark text-white shadow-sm border-0 d-flex flex-row align-items-center p-3">
-                        <img src="${filme.capa}" class="card-img-left" alt="${filme.titulo}" style="width: 150px; height: auto; object-fit: cover; border-radius: 10px;">
+                <div class="col-md-6 mb-4">
+                    <div class="card bg-dark text-white shadow-sm border-0 d-flex flex-row p-3">
+                        <img src="${filme.capa}" class="img-fluid rounded" alt="${filme.titulo}" style="width: 150px; height: 220px; object-fit: cover;">
                         <div class="card-body">
                             <h5 class="card-title">${filme.titulo}</h5>
                             <p><strong>Gênero:</strong> ${filme.genero}</p>
                             <p><strong>Duração:</strong> ${filme.duracao} min</p>
                             <p><strong>Data de Lançamento:</strong> ${dataFormatada}</p>
                             <p><strong>Sinopse:</strong> ${filme.sinopse}</p>
-                            <a href="${filme.link}" target="_blank" class="btn btn-danger">🎬 Assistir Trailer</a>
+                            <div class="d-flex align-items-center">
+                                <span class="fw-bold me-2">${avaliacaoTexto}</span>
+                                <div class="rating" data-index="${index}">
+                                    ${gerarEstrelas(filme.avaliacao)}
+                                </div>
+                            </div>
+                            <a href="${filme.link}" target="_blank" class="btn btn-danger mt-2">🎬 Assistir Trailer</a>
                         </div>
                     </div>
                 </div>
             `;
         });
         document.getElementById('lista-filmes').innerHTML = html;
+        ativarEstrelas();
+    }
+
+    function gerarEstrelas(avaliacao) {
+        let estrelasHTML = '';
+        for (let i = 1; i <= 5; i++) {
+            estrelasHTML += `<span class="star" data-value="${i}" style="color: ${i <= avaliacao ? 'yellow' : 'white'}; cursor: pointer;">★</span>`;
+        }
+        return estrelasHTML;
+    }
+
+    function ativarEstrelas() {
+        document.querySelectorAll('.rating').forEach(rating => {
+            rating.addEventListener('click', function (e) {
+                if (e.target.classList.contains('star')) {
+                    let valor = e.target.getAttribute('data-value');
+                    let estrelas = this.querySelectorAll('.star');
+                    
+                    estrelas.forEach((s, index) => {
+                        s.style.color = index < valor ? 'yellow' : 'white';
+                    });
+                }
+            });
+        });
     }
 
     function carregarGeneros() {
@@ -114,27 +145,17 @@
         border-radius: 10px;
     }
     .card {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
         transition: transform 0.3s ease-in-out;
-        height: auto;
     }
     .card:hover {
         transform: scale(1.02);
     }
-    .card-body {
-        flex: 1;
-    }
     .card-body p {
         font-size: 14px;
     }
-    .card-img-left {
-        flex-shrink: 0;
-        width: 150px;
-        height: auto;
-        object-fit: cover;
-        border-radius: 10px;
+    .star {
+        font-size: 24px;
+        transition: color 0.3s;
     }
 </style>
 
